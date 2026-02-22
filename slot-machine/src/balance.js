@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-export function createBalance(initialBalance = 10000) {
+export function createBalance(initialBalance = 30000) {
     const balanceFrame = new PIXI.Graphics();
 
     balanceFrame.rect(80, 610, 660, 60)

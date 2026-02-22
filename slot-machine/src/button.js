@@ -38,7 +38,7 @@ export function createSlotButton(x, y, label, onClick) {
             distance: 2,
         },
     });
-    const buttonText = new PIXI.Text('SPIN', style);
+    const buttonText = new PIXI.Text({text: 'SPIN', style });
     buttonText.anchor.set(0.5);
 
     // 컨테이너에 추가
