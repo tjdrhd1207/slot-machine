@@ -12,6 +12,7 @@ const winTable = {
 import * as PIXI from 'pixi.js';
 
 export function createBetting(onBetChange, onAmountChange, initialMult = '1.2x', initialBet = '3000') {
+    console.log("크리에이팅");
     const bettingFrame = new PIXI.Graphics();
 
     const multiplierButtons = [];
@@ -68,7 +69,18 @@ export function createBetting(onBetChange, onAmountChange, initialMult = '1.2x',
 
     multiplierRates.forEach((rate, i) => {
         const isSelected = (rate === initialMult)
-        const btn = createGridButton(rate, i, 120, 0xac4e4e, multiplierButtons, (val) => onBetChange(parseFloat(val)));
+        const btn = createGridButton(rate, i, 120, 0xac4e4e, multiplierButtons, (selectedVal) => {
+            // 모든 배율 버튼 다시 회색으로 초기화
+            multiplierButtons.forEach(otherBtn => {
+                otherBtn.tint = 0x333333; 
+            });
+
+            // 현재 선택된 버튼 금색
+            btn.tint = 0xFFCC00;
+
+            // 외부로 값 전달
+            onBetChange(parseFloat(selectedVal));
+        });
         
         if (isSelected) {
             btn.tint = 0xFFCC00; // 선택된 버튼은 금색
@@ -90,7 +102,17 @@ export function createBetting(onBetChange, onAmountChange, initialMult = '1.2x',
     const betAmounts = ['1000', '2000', '3000', '5000'];
     betAmounts.forEach((amount, i) => {
         const isSelected = (amount === initialBet)
-        const btn = createGridButton(amount, i, 390, 0x4e7cac, amountButtons, (val) => onAmountChange(parseFloat(val)));
+        const btn = createGridButton(amount, i, 390, 0x4e7cac, amountButtons, (selectedVal) => {
+            // 모든 배율 버튼 다시 회색으로 초기화
+            amountButtons.forEach(otherBtn => {
+                otherBtn.tint = 0x333333; 
+            });
+
+            // 현재 선택된 버튼 금색
+            btn.tint = 0xFFCC00;
+
+            onAmountChange(parseFloat(selectedVal));
+        });
 
         if (isSelected) {
             btn.tint = 0xFFCC00; // 선택된 버튼은 금색
