@@ -149,7 +149,7 @@ export function createBetting(onBetChange, onAmountChange, initialMult = '1.2x',
         buttonText.y = BUTTON_HEIGHT / 2;
 
         buttonContainer.addChild(shadow, body, buttonText);
-        bettingFrame.addChild(buttonContainer);
+        // bettingFrame.addChild(buttonContainer);
 
         buttonContainer.on('pointerdown', () => {
             body.y = 2;

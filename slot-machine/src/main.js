@@ -13,8 +13,10 @@ import { calculateWaysWin } from './calculateWaysWin.js';
     width: 800,
     height: 700,
     backgroundColor: 0x000000,
-    antialias: true
-  });
+    antialias: true,
+    resolution: window.devicePixelRatio || 1, // 디바이스 픽셀비 대응
+    autoDensity: true // CSS 크기와 렌더러 크기를 독립적으로 관리
+});
   document.body.appendChild(app.canvas);
 
   // ---2. 메인 컨테이너 생성
@@ -69,20 +71,30 @@ import { calculateWaysWin } from './calculateWaysWin.js';
   const balanceUI = createBalance();
   gameScene.addChild(balanceUI.balanceFrame);
 
+  //---------------------------- reel 생성------------------------
+  // 1. 모든 릴을 담을 '릴 전용 컨테이너' 생성
+  const reelsWrapper = new PIXI.Container();
+  reelsWrapper.x = 110; 
+  reelsWrapper.y = 140;
+  gameScene.addChild(reelsWrapper);
+
   // 릴 생성
   const reelMask = new PIXI.Graphics()
-    .roundRect(110, 140, 600, 420, 10)
+    .roundRect(0, 0, 600, 420, 10) // x, y를 0으로 설정
     .fill(0xffffff);
-  gameScene.addChild(reelMask);
+
+  // 3. 마스크를 Wrapper 컨테이너의 자식으로 추가
+  reelsWrapper.addChild(reelMask);
+  reelsWrapper.mask = reelMask; // 컨테이너 전체에 마스크 적용
 
   for (let i = 0; i < REEL_COUNT; i++) {
     // 릴마다 개별적으로 섞인 리스트 생성
     const mySymbols = [...symbolFiles].sort(() => Math.random() - 0.5);
     const uniqueTexture = await createRandomReelTexture(mySymbols); // 헬퍼 함수 사용 가정
-
     const reelContainer = new PIXI.Container();
-    reelContainer.x = i * (SYMBOL_SIZE + 20) + 120;
-    reelContainer.y = 150;
+
+    reelContainer.x = i * (SYMBOL_SIZE + 20) + 10;
+    reelContainer.y = 10;
 
     const tSprite = new PIXI.TilingSprite({
       texture: uniqueTexture,
@@ -90,11 +102,8 @@ import { calculateWaysWin } from './calculateWaysWin.js';
       height: SYMBOL_SIZE * 4, // 화면에 보여줄 칸수(4칸)만큼만 높이 설정
     });
 
-    reelContainer.addChild(tSprite);
-    gameScene.addChild(reelContainer);
-
-    // 마스크 적용 (이미 reelMask가 생성되어 있어야 함)
-    reelContainer.mask = reelMask;
+    reelContainer.addChild(tSprite);    
+    reelsWrapper.addChild(reelContainer);
 
     // 각 릴의 상태를 객체로 저장
     reels.push({
@@ -340,25 +349,29 @@ import { calculateWaysWin } from './calculateWaysWin.js';
 
 
   function resize() {
-    // 기준 너비, 기준 높이
     const designWidth = 800;
     const designHeight = 700;
 
-    // 현재 브라우저 크기
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    // 가로 세로 비율 스케일 계산
+    // 1. 스케일 계산 (비율 유지)
     const scale = Math.min(windowWidth / designWidth, windowHeight / designHeight);
 
+    // 2. 게임 씬 크기 조절
     gameScene.scale.set(scale);
 
-    // 화면 중앙 정렬
+    // 3. 게임 씬 중앙 정렬
     gameScene.x = (windowWidth - designWidth * scale) / 2;
     gameScene.y = (windowHeight - designHeight * scale) / 2;
 
+    // 4. 렌더러 크기를 실제 브라우저 크기에 맞춤
     app.renderer.resize(windowWidth, windowHeight);
-  }
+    
+    // [추가] 캔버스 요소 자체가 부모를 뚫고 나가지 않게 스타일 강제
+    app.canvas.style.width = `${windowWidth}px`;
+    app.canvas.style.height = `${windowHeight}px`;
+}
   window.addEventListener('resize', resize);
   resize();
 
