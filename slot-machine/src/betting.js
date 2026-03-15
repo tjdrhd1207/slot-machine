@@ -11,7 +11,7 @@ const winTable = {
 
 import * as PIXI from 'pixi.js';
 
-export function createBetting(onBetChange, onAmountChange) {
+export function createBetting(onBetChange, onAmountChange, initialMult = '1.2x', initialBet = '3000') {
     const bettingFrame = new PIXI.Graphics();
 
     const multiplierButtons = [];
@@ -67,7 +67,15 @@ export function createBetting(onBetChange, onAmountChange) {
     const SPACING = 15; // 버튼 사이 간격
 
     multiplierRates.forEach((rate, i) => {
+        const isSelected = (rate === initialMult)
         const btn = createGridButton(rate, i, 120, 0xac4e4e, multiplierButtons, (val) => onBetChange(parseFloat(val)));
+        
+        if (isSelected) {
+            btn.tint = 0xFFCC00; // 선택된 버튼은 금색
+        } else {
+            btn.tint = 0x333333; // 나머지는 회색
+        }
+
         bettingFrame.addChild(btn);
     });
 
@@ -81,7 +89,15 @@ export function createBetting(onBetChange, onAmountChange) {
 
     const betAmounts = ['1000', '2000', '3000', '5000'];
     betAmounts.forEach((amount, i) => {
+        const isSelected = (amount === initialBet)
         const btn = createGridButton(amount, i, 390, 0x4e7cac, amountButtons, (val) => onAmountChange(parseFloat(val)));
+
+        if (isSelected) {
+            btn.tint = 0xFFCC00; // 선택된 버튼은 금색
+        } else {
+            btn.tint = 0x333333; // 나머지는 회색
+        }
+
         bettingFrame.addChild(btn);
     });
 
